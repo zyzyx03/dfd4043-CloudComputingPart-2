@@ -176,7 +176,7 @@ sudo vim /etc/httpd/conf/httpd.conf
 sudo yum install php-gd
 sudo yum list installed | grep php-gd
 yum list | grep php-gd
-sudo yum install php72-gd
+sudo yum install php-gd
 ```
 
 # 7. To fix file permissions for the Apache web server
