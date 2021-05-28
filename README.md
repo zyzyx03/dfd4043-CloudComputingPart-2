@@ -105,7 +105,7 @@ sudo systemctl start mariadb
 
 # To create and edit the wp-config.php file
 mysql -u root -p
-CREATE USER 'wordpress-user'@'localhost' IDENTIFIED BY 'your_strong_password';
+CREATE USER 'wordpress-user'@'localhost' IDENTIFIED BY 'p@ssw0rdYangS@ngatKuat';
 CREATE DATABASE `wordpress-db`;
 GRANT ALL PRIVILEGES ON `wordpress-db`.* TO "wordpress-user"@"localhost";
 FLUSH PRIVILEGES;
@@ -117,7 +117,7 @@ FLUSH PRIVILEGES;
 cp wordpress/wp-config-sample.php wordpress/wp-config.php
 
 # Edit wp-config.php
-nano wordpress/wp-config.php
+vim wordpress/wp-config.php
 
 define('DB_NAME', 'wordpress-db');
 define('DB_USER', 'wordpress-user');
@@ -137,6 +137,7 @@ cp -r wordpress/* /var/www/html/blog/
 # 5. To allow WordPress to use permalinks
 ```bash
 sudo vim /etc/httpd/conf/httpd.conf
+# with Vim Jump to line 151
 
 #Find the section that starts with <Directory "/var/www/html">.
 
@@ -189,7 +190,7 @@ sudo chmod 2775 /var/www
 find /var/www -type d -exec sudo chmod 2775 {} \;
 #Recursively change the file permissions of /var/www and its subdirectories to add group write permissions.
 find /var/www -type f -exec sudo chmod 0664 {} \;
-Restart the Apache web server to pick up the new group and permissions.
+#Restart the Apache web server to pick up the new group and permissions.
 sudo systemctl restart httpd && sudo service httpd restart
 ```
 
@@ -200,4 +201,10 @@ sudo systemctl status mariadb
 sudo systemctl start mariadb
 sudo systemctl status httpd
 sudo systemctl start httpd
+```
+
+# 9. Login credential
+```bash
+superadmin
+LeL3L8E(xIf8CHNAD*
 ```
