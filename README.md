@@ -5,7 +5,7 @@
 > A company is searching for possible web developer for its corporate website. You are
 required to provide a website prototype using the AWS cloud environment to a client. Work in a team of three to four people. This time it will be a stateful web application.
 
-## 1. The Hard way with EC2 instance
+# 1. The Hard way with EC2 instance
 > We will deploy an EC2 instance as a standalone static website.
 
 1. OS: Amazon Linux 2
@@ -92,15 +92,15 @@ sudo systemctl start mariadb
 ```
 [reference](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-lamp-amazon-linux-2.html#prepare-lamp-server)
 
-# 2. Install Wordpress
+## 2. Install Wordpress
 ```bash
 # To download and unzip the WordPress installation package
 wget https://wordpress.org/latest.tar.gz
 
-# Unzip
+## Unzip
 tar -xzf latest.tar.gz
 
-# To create a database user and database for your WordPress installation
+## To create a database user and database for your WordPress installation
 sudo systemctl start mariadb
 
 # To create and edit the wp-config.php file
@@ -111,7 +111,7 @@ GRANT ALL PRIVILEGES ON `wordpress-db`.* TO "wordpress-user"@"localhost";
 FLUSH PRIVILEGES;
 ```
 
-# 3. To create and edit the wp-config.php file
+## 3. To create and edit the wp-config.php file
 ```bash
 # Copy wp-config-sample
 cp wordpress/wp-config-sample.php wordpress/wp-config.php
@@ -125,16 +125,16 @@ define('DB_PASSWORD', 'your_strong_password');
 ```
 [Salt and Key](https://api.wordpress.org/secret-key/1.1/salt/)
 
-# 4. To install your WordPress files under the Apache document root
+## 4. To install your WordPress files under the Apache document root
 
 ```bash
 cp -r wordpress/* /var/www/html/
 
-## Alternative other than document root.
+# Alternative other than document root.
 mkdir /var/www/html/blog
 cp -r wordpress/* /var/www/html/blog/
 ```
-# 5. To allow WordPress to use permalinks
+## 5. To allow WordPress to use permalinks
 ```bash
 sudo vim /etc/httpd/conf/httpd.conf
 # with Vim Jump to line 151
@@ -171,7 +171,7 @@ sudo vim /etc/httpd/conf/httpd.conf
 
 ```
 
-# 6. To install the PHP graphics drawing library on Amazon Linux 2
+## 6. To install the PHP graphics drawing library on Amazon Linux 2
 ```bash
 sudo yum install php-gd
 sudo yum list installed | grep php-gd
@@ -179,7 +179,7 @@ yum list | grep php-gd
 sudo yum install php-gd
 ```
 
-# 7. To fix file permissions for the Apache web server
+## 7. To fix file permissions for the Apache web server
 ```bash
 #Grant file ownership of /var/www and its contents to the apache user.
 sudo chown -R apache /var/www
@@ -194,7 +194,7 @@ find /var/www -type f -exec sudo chmod 0664 {} \;
 sudo systemctl restart httpd && sudo service httpd restart
 ```
 
-# 8. To run the WordPress installation script with Amazon Linux 2
+## 8. To run the WordPress installation script with Amazon Linux 2
 ```bash
 sudo systemctl enable httpd && sudo systemctl enable mariadb
 sudo systemctl status mariadb
@@ -203,8 +203,10 @@ sudo systemctl status httpd
 sudo systemctl start httpd
 ```
 
-# 9. Login credential
+## 9. Login credential
 ```bash
 superadmin
 LeL3L8E(xIf8CHNAD*
 ```
+
+# Preferred way with Lightsail
