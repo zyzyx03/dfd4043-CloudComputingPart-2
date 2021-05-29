@@ -209,4 +209,122 @@ superadmin
 LeL3L8E(xIf8CHNAD*
 ```
 
-# Preferred way with Lightsail
+# Preferred way with Amazon Lightsail
+
+1. Create Instance
+2. Create Database
+3. Create IAM Policy
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "s3:PutObject",
+                "s3:GetObjectAcl",
+                "s3:GetObject",
+                "s3:PutBucketAcl",
+                "s3:ListBucket",
+                "s3:DeleteObject",
+                "s3:GetBucketAcl",
+                "s3:GetBucketLocation",
+                "s3:PutObjectAcl"
+            ],
+            "Resource": [
+                "arn:aws:s3:::<your bucket name>",
+                "arn:aws:s3:::<your bucket name>/*"
+            ]
+        }
+    ]
+}
+```
+4. Configure managed database
+
+> Load this env variable to the OS
+```bash
+# Before
+LSDB_USERNAME=<DatabaseUserName>
+LSDB_ENDPOINT=<DatabaseEndpoint>
+LSDB_PASSWORD='<DatabasePassword>'
+ACCESS_KEY=<AccessKeyID>
+SECRET_KEY=<SecretAccessKey>
+
+# After
+LSDB_USERNAME='wordpressUser'
+LSDB_ENDPOINT='ls-0b384abc5dd97ae16830de515c951469261f7095.c46fmzhi3xzu.ap-southeast-1.rds.amazonaws.com'
+LSDB_PASSWORD='0F!|99Xu%&N8=.Hj^Zi-j-t(}usF)lgG'
+ACCESS_KEY='AKIA4UHMPSGHMZGJXRFI'
+SECRET_KEY='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'
+```
+```bash
+set -o allexport; source env.txt; set +o allexport
+```
+
+5. Dump the database to localhost
+```bash
+sudo mysqldump -u root --databases bitnami_wordpress --single-transaction --order-by-primary -p > dump.sql
+```
+
+6. Dump it to RDS
+```bash
+cat dump.sql | sudo mysql --user $LSDB_USERNAME --host $LSDB_ENDPOINT -p
+```
+
+7. Backup wp-config.php before modify
+```bash
+cp /home/bitnami/apps/wordpress/htdocs/wp-config.php /home/bitnami/apps/wordpress/htdocs/wp-config.php.bak
+```
+
+8. Obtain the WPDB_PASSWORD
+```bash
+cat /home/bitnami/apps/wordpress/htdocs/wp-config.php | grep DB_PASSWORD | cut -d \' -f 4
+```
+
+9. Update The env variable file with the following config
+```bash
+## Add the WPDB variable and add 3306 port at LSDB_ENDPOINT
+LSDB_USERNAME='wordpressUser'
+LSDB_ENDPOINT='ls-0b384abc5dd97ae16830de515c951469261f7095.c46fmzhi3xzu.ap-southeast-1.rds.amazonaws.com':3306
+LSDB_PASSWORD='0F!|99Xu%&N8=.Hj^Zi-j-t(}usF)lgG'
+ACCESS_KEY='AKIA4UHMPSGHMZGJXRFI'
+SECRET_KEY='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'
+WPDB_PASSWORD='8acb9c7bde'
+
+## Load the env variable
+set -o allexport; source env.txt; set +o allexport
+```
+10. Invoke wordpress cli to add the MySQL managed database user name, password, and endpoint to the wp-config.php file
+
+```bash
+wp config set DB_USER $LSDB_USERNAME && wp config set DB_PASSWORD $LSDB_PASSWORD && wp config set DB_HOST $LSDB_ENDPOINT
+```
+11. Create IAM credential file
+```bash
+cat <<EOT >> credfile.txt
+define( 'AS3CF_SETTINGS', serialize( array (
+    'provider' => 'aws', 
+    'access-key-id' => '$ACCESS_KEY', 
+    'secret-access-key' => '$SECRET_KEY',
+) ) );
+EOT
+```
+12. Enter the following command to insert the contents of the credfile.txt into the wp-config.php file.
+```bash
+sed -i "/define( 'WP_DEBUG', false );/r credfile.txt" /home/bitnami/apps/wordpress/htdocs/wp-config.php
+```
+
+13. Delete the credential file
+```bash
+sudo rm –r credfile.txt
+```
+
+14. Enter the following command to correct the permissions for the wp-config.php file, and the backup that you created.
+```bash
+sudo chown bitnami:daemon /home/bitnami/apps/wordpress/htdocs/wp-config.php && sudo chown bitnami:daemon /home/bitnami/apps/wordpress/htdocs/wp-config.php.bak
+```
+15. Restart Service
+```bash
+sudo /opt/bitnami/ctlscript.sh restart
+```
